@@ -29,10 +29,38 @@ router.post('/register', async (req, res) => {
 
     await newUser.save();
 
+    console.log('Usuario registrado exitosamente:', newUser);
+
     res.status(201).json({ message: 'Usuario registrado exitosamente.' });
   } catch (error) {
     console.error('Error in /register:', error);
     res.status(500).json({ error: 'Error del servidor al registrar el usuario.' });
+  }
+});
+
+// POST /api/auth/login
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Verificar si el usuario existe
+    const user = await User.findOne({ correo: email });
+    if (!user) {
+      return res.status(401).json({ error: 'Credenciales inválidas.' });
+    }
+
+    // Verificar contraseña
+    const isValidPassword = await bcrypt.compare(password, user.contrasena);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Credenciales inválidas.' });
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Login exitoso.', user: { nombre: user.nombre, correo: user.correo } });
+  } catch (error) {
+    console.error('Error in /login:', error);
+    res.status(500).json({ error: 'Error del servidor al iniciar sesión.' });
   }
 });
 

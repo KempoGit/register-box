@@ -44,11 +44,17 @@ export class LoginComponent {
       password: this.loginForm.password().value()
     };
 
-    // Simulate network request
-    setTimeout(() => {
-      console.log('Login credentials:', payload);
-      this.isSubmitting.set(false);
-      this.errorMessage.set('Login exitoso. Funcionalidad backend pendiente.');
-    }, 1500);
+    this.http.post('http://localhost:5001/api/auth/login', payload)
+      .subscribe({
+        next: (response: any) => {
+          this.isSubmitting.set(false);
+          this.errorMessage.set(response.message || 'Login exitoso.');
+        },
+        error: (err) => {
+          this.isSubmitting.set(false);
+          const msg = err.error?.error || 'Error de conexión con el servidor.';
+          this.errorMessage.set(msg);
+        }
+      });
   }
 }
