@@ -16,4 +16,12 @@ export class AuthService {
   register(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, payload);
   }
+
+  forgotPassword(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, payload);
+  }
+
+  resetPassword(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, payload);
+  }
 }

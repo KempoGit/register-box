@@ -49,7 +49,9 @@
   </form>
 
   <div class="login-footer">
-    <a href="#" class="footer-link">¿Olvidaste tu contraseña?</a>
+    <a href="#" (click)="$event.preventDefault(); goToForgot.emit()" class="footer-link"
+      >¿Olvidaste tu contraseña?</a
+    >
     <span class="divider"></span>
     <a href="#" (click)="$event.preventDefault(); goToRegister.emit()" class="footer-link"
       >Registrarse</a

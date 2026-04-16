@@ -1,8 +1,16 @@
-<div class="slider-wrapper" [class.slide-active]="isRegistering()">
+<div
+  class="slider-wrapper"
+  [class.view-login]="currentView() === 'login'"
+  [class.view-register]="currentView() === 'register'"
+  [class.view-forgot]="currentView() === 'forgot'"
+>
+  <div class="slider-panel forgot-pane">
+    <app-forgot-password (goToLogin)="setView('login')"></app-forgot-password>
+  </div>
   <div class="slider-panel login-pane">
-    <app-login (goToRegister)="toggleRegister()"></app-login>
+    <app-login (goToRegister)="setView('register')" (goToForgot)="setView('forgot')"></app-login>
   </div>
   <div class="slider-panel register-pane">
-    <app-register (goToLogin)="toggleRegister()"></app-register>
+    <app-register (goToLogin)="setView('login')"></app-register>
   </div>
 </div>

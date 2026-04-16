@@ -16,6 +16,7 @@ export class LoginComponent {
   private authService = inject(AuthService);
 
   goToRegister = output<void>();
+  goToForgot = output<void>();
 
   protected isSubmitting = signal(false);
   protected errorMessage = signal<string | null>(null);
