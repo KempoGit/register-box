@@ -55,7 +55,7 @@ export class ResetPasswordComponent implements OnInit {
       next: (res: any) => {
         this.isSubmitting.set(false);
         this.errorMessage.set(res.message);
-        setTimeout(() => this.router.navigate(['/']), 2000);
+        this.router.navigate(['/'])
       },
       error: (err) => {
         this.isSubmitting.set(false);

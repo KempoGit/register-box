@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
 // POST /api/auth/register
@@ -78,16 +79,27 @@ router.post('/forgot-password', async (req, res) => {
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '15m' });
 
     const resetLink = `http://localhost:4200/reset-password/${token}`;
-    console.log(`\n\n========================================`);
-    console.log(`✉️ SIMULADOR DE EMAIL`);
-    console.log(`Para: ${email}`);
-    console.log(`Asunto: Recuperación de tu contraseña`);
-    console.log(`Haz clic en este enlace para crear una nueva contraseña:`);
-    console.log(resetLink);
-    console.log(`========================================\n\n`);
+
+    // Configuración de Nodemailer usando las credenciales del .env
+    const transporter = nodemailer.createTransport({
+      service: 'gmail', // Por defecto usamos Gmail, puedes cambiarlo si usas otro
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Register-Box" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Recuperación de tu contraseña - Register-Box',
+      text: `Has solicitado restablecer tu contraseña.\n\nHaz clic en el siguiente enlace para crear una nueva contraseña. Este enlace expirará en 15 minutos:\n\n${resetLink}\n\nSi no solicitaste esto, puedes ignorar este correo con seguridad.`,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     res.status(200).json({
-      message: 'Correo de recuperación enviado exitosamente. Revisa la terminal backend.',
+      message: 'Correo de recuperación enviado exitosamente.',
     });
   } catch (error) {
     console.error('Error in /forgot-password:', error);
