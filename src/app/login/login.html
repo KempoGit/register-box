@@ -4,7 +4,7 @@
     <p>Bienvenido a register-box</p>
   </div>
 
-  <form (ngSubmit)="onSubmit()" class="login-form">
+  <form (submit)="$event.preventDefault(); onSubmit()" class="login-form">
     <div class="form-group">
       <label for="email">Correo Electrónico</label>
       <input

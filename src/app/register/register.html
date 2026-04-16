@@ -4,7 +4,7 @@
     <p>Únete a la familia register-box</p>
   </div>
 
-  <form (ngSubmit)="onRegisterSubmit()" class="login-form">
+  <form (submit)="$event.preventDefault(); onRegisterSubmit()" class="login-form">
     <div class="form-group">
       <label for="reg-nombre">Nombre</label>
       <input
