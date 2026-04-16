@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, signal, inject, output } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../services/auth.service';
 import { email, form, FormField, required, minLength } from '@angular/forms/signals';
 
 interface LoginData { email: string; password: string; }
@@ -13,7 +13,7 @@ interface LoginData { email: string; password: string; }
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
-  private http = inject(HttpClient);
+  private authService = inject(AuthService);
 
   goToRegister = output<void>();
 
@@ -44,7 +44,7 @@ export class LoginComponent {
       password: this.loginForm.password().value()
     };
 
-    this.http.post('http://localhost:5001/api/auth/login', payload)
+    this.authService.login(payload)
       .subscribe({
         next: (response: any) => {
           this.isSubmitting.set(false);

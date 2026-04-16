@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, signal, inject, output } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../services/auth.service';
 import { email, form, FormField, required, minLength } from '@angular/forms/signals';
 
 interface RegisterData { nombre: string; apellido: string; fecha_nacimiento: string; correo: string; contrasena: string; }
@@ -13,7 +13,7 @@ interface RegisterData { nombre: string; apellido: string; fecha_nacimiento: str
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
-  private http = inject(HttpClient);
+  private authService = inject(AuthService);
 
   goToLogin = output<void>();
 
@@ -36,11 +36,7 @@ export class RegisterComponent {
 
     // Manual check for global valid 
     if (
-      this.registerForm.nombre().invalid() ||
-      this.registerForm.apellido().invalid() ||
-      this.registerForm.fecha_nacimiento().invalid() ||
-      this.registerForm.correo().invalid() ||
-      this.registerForm.contrasena().invalid()
+      this.registerForm().invalid()
     ) {
       this.errorMessage.set('Por favor, complete los campos correctamente.');
       return;
@@ -56,13 +52,13 @@ export class RegisterComponent {
       contrasena: this.registerForm.contrasena().value()
     };
 
-    this.http.post('http://localhost:5001/api/auth/register', payload)
+    this.authService.register(payload)
       .subscribe({
         next: (response: any) => {
           this.isSubmitting.set(false);
           this.errorMessage.set(response.message || 'Registro exitoso. Puedes iniciar sesión.');
           this.registerModel.set({ nombre: '', apellido: '', fecha_nacimiento: '', correo: '', contrasena: '' });
-          setTimeout(() => this.goToLogin.emit(), 1500);
+          this.goToLogin.emit()
         },
         error: (error) => {
           this.isSubmitting.set(false);
