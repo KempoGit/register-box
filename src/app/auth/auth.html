@@ -1,0 +1,8 @@
+<div class="slider-wrapper" [class.slide-active]="isRegistering()">
+  <div class="slider-panel login-pane">
+    <app-login (goToRegister)="toggleRegister()"></app-login>
+  </div>
+  <div class="slider-panel register-pane">
+    <app-register (goToLogin)="toggleRegister()"></app-register>
+  </div>
+</div>

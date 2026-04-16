@@ -1,0 +1,100 @@
+<div class="register-container glass-panel">
+  <div class="login-header">
+    <h2>Crear Cuenta</h2>
+    <p>Únete a la familia register-box</p>
+  </div>
+
+  <form (ngSubmit)="onRegisterSubmit()" class="login-form">
+    <div class="form-group">
+      <label for="reg-nombre">Nombre</label>
+      <input
+        type="text"
+        id="reg-nombre"
+        [formField]="registerForm.nombre"
+        class="glass-input"
+        placeholder="Tu nombre"
+      />
+      @if (registerForm.nombre().touched() && registerForm.nombre().invalid()) {
+        @for (error of registerForm.nombre().errors(); track error) {
+          <span class="error-text">{{ error.message }}</span>
+        }
+      }
+    </div>
+    <div class="form-group">
+      <label for="reg-apellido">Apellido</label>
+      <input
+        type="text"
+        id="reg-apellido"
+        [formField]="registerForm.apellido"
+        class="glass-input"
+        placeholder="Tu apellido"
+      />
+      @if (registerForm.apellido().touched() && registerForm.apellido().invalid()) {
+        @for (error of registerForm.apellido().errors(); track error) {
+          <span class="error-text">{{ error.message }}</span>
+        }
+      }
+    </div>
+    <div class="form-group">
+      <label for="reg-fecha">Fecha de Nacimiento</label>
+      <input
+        type="date"
+        id="reg-fecha"
+        [formField]="registerForm.fecha_nacimiento"
+        class="glass-input"
+      />
+      @if (registerForm.fecha_nacimiento().touched() && registerForm.fecha_nacimiento().invalid()) {
+        @for (error of registerForm.fecha_nacimiento().errors(); track error) {
+          <span class="error-text">{{ error.message }}</span>
+        }
+      }
+    </div>
+    <div class="form-group">
+      <label for="reg-correo">Correo Electrónico</label>
+      <input
+        type="email"
+        id="reg-correo"
+        [formField]="registerForm.correo"
+        class="glass-input"
+        placeholder="ejemplo@correo.com"
+      />
+      @if (registerForm.correo().touched() && registerForm.correo().invalid()) {
+        @for (error of registerForm.correo().errors(); track error) {
+          <span class="error-text">{{ error.message }}</span>
+        }
+      }
+    </div>
+    <div class="form-group">
+      <label for="reg-password">Contraseña</label>
+      <input
+        type="password"
+        id="reg-password"
+        [formField]="registerForm.contrasena"
+        class="glass-input"
+        placeholder="••••••••"
+      />
+      @if (registerForm.contrasena().touched() && registerForm.contrasena().invalid()) {
+        @for (error of registerForm.contrasena().errors(); track error) {
+          <span class="error-text">{{ error.message }}</span>
+        }
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert-box" [class.success]="errorMessage()?.startsWith('Registro exitoso')">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <button type="submit" class="glass-button submit-btn" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Procesando...' : 'Confirmar' }}
+    </button>
+  </form>
+
+  <div class="login-footer">
+    <span class="divider"></span>
+    <a href="#" (click)="$event.preventDefault(); goToLogin.emit()" class="footer-link"
+      >Volver al Ingreso</a
+    >
+  </div>
+</div>
