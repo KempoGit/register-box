@@ -52,6 +52,11 @@ export class LoginComponent {
         next: (response: any) => {
           this.isSubmitting.set(false);
           this.errorMessage.set(null);
+          
+          if (response?.user?.correo) {
+            localStorage.setItem('pos_operator', response.user.correo);
+          }
+          
           this.router.navigate(['/pos']);
         },
         error: (err) => {

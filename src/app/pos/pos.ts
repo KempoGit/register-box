@@ -54,8 +54,15 @@ export class PosComponent {
 
   salesHistory = signal<any[]>([]);
   expandedSaleId = signal<string | null>(null);
+  
+  operatorEmail = signal<string>('invitado@sistema.com');
 
-  constructor() {}
+  constructor() {
+    const savedOperator = localStorage.getItem('pos_operator');
+    if (savedOperator) {
+      this.operatorEmail.set(savedOperator);
+    }
+  }
 
   private setTempMessage(type: 'error'|'success', msg: string) {
     if (type === 'error') this.errorMessage.set(msg);
@@ -154,7 +161,7 @@ export class PosComponent {
     if (this.cartItems().length === 0) return;
     
     this.isProcessing.set(true);
-    const sale = { items: this.cartItems(), total: this.subTotal() };
+    const sale = { items: this.cartItems(), total: this.subTotal(), operator: this.operatorEmail() };
 
     this.posService.checkout(sale).subscribe({
       next: () => {

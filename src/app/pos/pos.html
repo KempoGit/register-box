@@ -125,9 +125,20 @@
                 "
               >
                 <div
-                  style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.8rem"
+                  style="
+                    font-size: 0.85rem;
+                    color: var(--text-secondary);
+                    margin-bottom: 0.8rem;
+                    display: flex;
+                    justify-content: space-between;
+                  "
                 >
-                  Detalle de Productos:
+                  <span>Detalle de Productos:</span>
+                  @if (sale.operator) {
+                    <span
+                      >Cajero: <strong style="color: #fff">{{ sale.operator }}</strong></span
+                    >
+                  }
                 </div>
                 @for (item of sale.items; track item.barcode) {
                   <div

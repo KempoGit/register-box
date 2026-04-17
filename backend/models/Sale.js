@@ -11,6 +11,7 @@ const SaleSchema = new mongoose.Schema(
       },
     ],
     total: { type: Number, required: true },
+    operator: { type: String, required: false, default: 'Desconocido' },
   },
   { timestamps: true },
 );
