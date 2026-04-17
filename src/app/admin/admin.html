@@ -1,0 +1,125 @@
+<div class="admin-container">
+  @if (viewState() === 'login') {
+    <div class="glass-panel login-box">
+      <h2>Acceso Administrativo</h2>
+      @if (errorMessage()) {
+        <div class="alert-box error" style="margin-bottom: 2rem">{{ errorMessage() }}</div>
+      }
+      <div class="form-container">
+        <label>Usuario Maestro</label>
+        <input #user type="text" class="glass-input" placeholder="admin" />
+        <label>Contraseña Maestra</label>
+        <input
+          #pass
+          type="password"
+          class="glass-input"
+          placeholder="******"
+          (keyup.enter)="login(user.value, pass.value)"
+        />
+
+        <button
+          class="glass-button action-btn pay-btn"
+          [disabled]="isProcessing()"
+          (click)="login(user.value, pass.value)"
+          style="margin-top: 1rem"
+        >
+          Ingresar al Panel
+        </button>
+        <button class="glass-button close-btn" (click)="goToPos()">Volver a Seguridad</button>
+      </div>
+    </div>
+  }
+
+  @if (viewState() === 'dashboard') {
+    <header class="glass-panel admin-header">
+      <div class="brand">Control de Inventario DB</div>
+      @if (errorMessage()) {
+        <div class="alert-box error">{{ errorMessage() }}</div>
+      }
+      @if (successMessage()) {
+        <div class="alert-box success">{{ successMessage() }}</div>
+      }
+      <button class="glass-button logout-btn" (click)="logOut()">Cerrar Sesión</button>
+    </header>
+
+    <div class="glass-panel product-grid-box">
+      <table class="glass-table">
+        <thead>
+          <tr>
+            <th>Código de Barras</th>
+            <th>Nombre del Producto</th>
+            <th>Precio ($)</th>
+            <th>Mantenimiento</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (prod of products(); track prod._id) {
+            <tr>
+              @if (editingProductId() === prod._id) {
+                <td>
+                  <input
+                    #editBarcode
+                    type="text"
+                    class="glass-input small-input"
+                    [value]="prod.barcode"
+                  />
+                </td>
+                <td>
+                  <input
+                    #editName
+                    type="text"
+                    class="glass-input small-input"
+                    [value]="prod.name"
+                  />
+                </td>
+                <td>
+                  <input
+                    #editPrice
+                    type="number"
+                    class="glass-input small-input"
+                    [value]="prod.price"
+                  />
+                </td>
+                <td class="table-actions">
+                  <button
+                    class="glass-button action-btn save-btn"
+                    [disabled]="isProcessing()"
+                    (click)="
+                      saveProduct(prod._id, editBarcode.value, editName.value, editPrice.value)
+                    "
+                  >
+                    Guardar DB
+                  </button>
+                  <button class="glass-button action-btn cancel-btn" (click)="cancelEditing()">
+                    Cancelar
+                  </button>
+                </td>
+              } @else {
+                <td>
+                  <span style="font-family: monospace; color: var(--text-secondary)">{{
+                    prod.barcode
+                  }}</span>
+                </td>
+                <td>
+                  <strong>{{ prod.name }}</strong>
+                </td>
+                <td style="color: #4ade80">{{ prod.price | currency }}</td>
+                <td class="table-actions">
+                  <button class="glass-button action-btn edit-btn" (click)="startEditing(prod._id)">
+                    ✎ Modificar
+                  </button>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty-state">
+                No se registraron productos físicos en la base de datos de MongoDB.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

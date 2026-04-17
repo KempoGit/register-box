@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 
+// GET /api/products
+router.get('/', async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Error del servidor al obtener productos' });
+  }
+});
+
 // GET /api/products/:barcode
 router.get('/:barcode', async (req, res) => {
   try {
@@ -27,6 +37,22 @@ router.post('/', async (req, res) => {
     res.status(201).json(newProduct);
   } catch (error) {
     res.status(500).json({ error: 'Error del servidor al crear producto' });
+  }
+});
+
+// PUT /api/products/:id
+router.put('/:id', async (req, res) => {
+  try {
+    const { barcode, name, price } = req.body;
+    const updated = await Product.findByIdAndUpdate(
+      req.params.id,
+      { barcode, name, price },
+      { new: true },
+    );
+    if (!updated) return res.status(404).json({ error: 'Producto no encontrado' });
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Error del servidor al actualizar producto' });
   }
 });
 

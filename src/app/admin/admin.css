@@ -1,0 +1,181 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.login-box {
+  max-width: 400px;
+  margin: 15vh auto;
+  padding: 3rem;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  background: linear-gradient(to right, #a5b4fc, #818cf8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.form-container label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: -0.8rem;
+  margin-left: 0.2rem;
+}
+
+.glass-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.small-input {
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.4);
+}
+.small-input:focus {
+  border-color: #22c55e;
+}
+
+.action-btn {
+  padding: 0.85rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pay-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  border: none;
+}
+.pay-btn:disabled {
+  opacity: 0.5;
+  background: #374151;
+  cursor: not-allowed;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #a5b4fc, #818cf8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.product-grid-box {
+  padding: 2.5rem;
+  overflow-x: auto;
+}
+
+.glass-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.glass-table th {
+  text-align: left;
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.glass-table td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 1.1rem;
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.edit-btn {
+  background: #4f46e5;
+  padding: 0.65rem 1.2rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+.edit-btn:hover {
+  background: #6366f1;
+}
+.save-btn {
+  background: #16a34a;
+  padding: 0.65rem 1.2rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+.cancel-btn {
+  background: #dc2626;
+  padding: 0.65rem 1.2rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+
+.logout-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.close-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.1);
+}
+.alert-box {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+}
+.alert-box.error {
+  background: #dc2626;
+  color: white;
+}
+.alert-box.success {
+  background: #16a34a;
+  color: white;
+}
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 3rem !important;
+}
