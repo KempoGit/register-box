@@ -1,6 +1,6 @@
 :host {
   display: block;
-  min-height: 100vh;
+  min-height: 80vh;
   padding: 1.5rem;
   background: var(--bg-color);
   color: var(--text-color);
@@ -34,7 +34,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
-  height: calc(100vh - 120px);
+  height: calc(80vh);
 }
 
 .cart-section {
@@ -154,7 +154,7 @@
 
 .history-view {
   padding: 2rem;
-  height: calc(100vh - 120px);
+  height: calc(80vh);
   overflow-y: auto;
 }
 

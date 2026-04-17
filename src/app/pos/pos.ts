@@ -212,6 +212,7 @@ export class PosComponent {
   }
 
   logOut() {
+    localStorage.removeItem('pos_operator');
     this.router.navigate(['/']);
   }
 }

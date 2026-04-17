@@ -1,6 +1,11 @@
 <div class="pos-layout">
   <header class="glass-panel pos-header">
-    <div class="brand">Terminal Register-Box</div>
+    <div>
+      <div class="brand">Terminal Register-Box</div>
+      <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px">
+        Cajero: <span style="color: #4ade80">{{ operatorEmail() }}</span>
+      </div>
+    </div>
     @if (errorMessage()) {
       <div class="alert-box error">{{ errorMessage() }}</div>
     }
