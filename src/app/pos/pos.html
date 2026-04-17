@@ -90,9 +90,9 @@
           <button
             class="glass-button action-btn pay-btn"
             [disabled]="cartItems().length === 0 || isProcessing()"
-            (click)="nextPurchase()"
+            (click)="openPayment()"
           >
-            Pasar a la Siguiente Compra
+            Pago
           </button>
         </div>
       </aside>
@@ -102,11 +102,66 @@
   @if (viewState() === 'history') {
     <div class="history-view glass-panel">
       <div class="history-header">
-        <h2>Historial de Compras Recientes</h2>
+        <h2>Historial de Compras de Hoy</h2>
         <button class="glass-button close-btn" (click)="closeView()">Volver a la Caja</button>
       </div>
+
+      <div style="display: flex; gap: 1rem; margin-bottom: 2rem">
+        <div
+          style="
+            flex: 1;
+            padding: 1.5rem;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            text-align: center;
+          "
+        >
+          <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 1rem">
+            Caja Efectivo
+          </h3>
+          <h2 style="color: #4ade80; font-size: 2rem; margin: 0">
+            {{ totalEfectivo() | currency }}
+          </h2>
+        </div>
+        <div
+          style="
+            flex: 1;
+            padding: 1.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            text-align: center;
+          "
+        >
+          <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 1rem">
+            Caja Tarjeta
+          </h3>
+          <h2 style="color: #60a5fa; font-size: 2rem; margin: 0">
+            {{ totalTarjeta() | currency }}
+          </h2>
+        </div>
+        <div
+          style="
+            flex: 1;
+            padding: 1.5rem;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            text-align: center;
+          "
+        >
+          <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 1rem">
+            Caja Virtual
+          </h3>
+          <h2 style="color: #c084fc; font-size: 2rem; margin: 0">
+            {{ totalVirtual() | currency }}
+          </h2>
+        </div>
+      </div>
+
       <div class="history-list">
-        @for (sale of salesHistory(); track sale._id) {
+        @for (sale of todaySales(); track sale._id) {
           <div
             class="sale-card"
             (click)="toggleSale(sale._id)"
@@ -176,6 +231,124 @@
         } @empty {
           <p>No hay compras registradas en la base de datos.</p>
         }
+      </div>
+    </div>
+  }
+
+  @if (viewState() === 'payment') {
+    <div class="payment-view glass-panel">
+      <div class="history-header">
+        <h2>Procesar Pago</h2>
+        <button class="glass-button close-btn" (click)="cancelPayment()">Volver</button>
+      </div>
+      <div class="form-container" style="text-align: center; margin-top: 1rem">
+        <h1 style="color: var(--primary-color); font-size: 3rem; margin-bottom: 2rem">
+          Total: {{ subTotal() | currency }}
+        </h1>
+
+        <label
+          style="
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: var(--text-secondary);
+          "
+        >
+          ¿Con cuánto paga el cliente?
+        </label>
+        <input
+          type="number"
+          class="glass-input"
+          style="
+            font-size: 2rem;
+            width: auto;
+            text-align: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            margin-left: auto;
+            margin-right: auto;
+          "
+          placeholder="Ej: 5000"
+          [value]="customerPayment() || ''"
+          (input)="updatePaymentAmount($event)"
+          autofocus
+        />
+
+        <div
+          style="
+            margin: 2rem auto;
+            width: auto;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+          "
+        >
+          <h2 style="font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 0.5rem">
+            Vuelto a entregar:
+          </h2>
+          <h1 style="font-size: 3.5rem; color: #4ade80; margin: 0">
+            {{ changeAmount() | currency }}
+          </h1>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem">
+          <button
+            class="glass-button action-btn"
+            style="
+              background: rgba(34, 197, 94, 0.2);
+              border-color: rgba(34, 197, 94, 0.4);
+              color: #4ade80;
+              flex: 1;
+              max-width: 200px;
+            "
+            (click)="finalizePurchase('Efectivo')"
+            [disabled]="isProcessing()"
+          >
+            Pago
+          </button>
+          <button
+            class="glass-button action-btn"
+            style="
+              background: rgba(59, 130, 246, 0.2);
+              border-color: rgba(59, 130, 246, 0.4);
+              color: #60a5fa;
+              flex: 1;
+              max-width: 200px;
+            "
+            (click)="finalizePurchase('Tarjeta')"
+            [disabled]="isProcessing()"
+          >
+            Pago con Tarjeta
+          </button>
+          <button
+            class="glass-button action-btn"
+            style="
+              background: rgba(168, 85, 247, 0.2);
+              border-color: rgba(168, 85, 247, 0.4);
+              color: #c084fc;
+              flex: 1;
+              max-width: 200px;
+            "
+            (click)="finalizePurchase('Billetera Virtual')"
+            [disabled]="isProcessing()"
+          >
+            Billetera Virtual
+          </button>
+          <button
+            class="glass-button action-btn"
+            style="
+              background: rgba(239, 68, 68, 0.2);
+              border-color: rgba(239, 68, 68, 0.4);
+              color: #f87171;
+              flex: 1;
+              max-width: 200px;
+            "
+            (click)="cancelPurchase()"
+            [disabled]="isProcessing()"
+          >
+            No pago
+          </button>
+        </div>
       </div>
     </div>
   }

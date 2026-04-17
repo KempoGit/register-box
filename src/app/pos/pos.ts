@@ -39,7 +39,13 @@ export class PosComponent {
     }
   }
 
-  viewState = signal<'pos' | 'history' | 'add'>('pos');
+  viewState = signal<'pos' | 'history' | 'add' | 'payment'>('pos');
+  customerPayment = signal<number | null>(null);
+  
+  changeAmount = computed(() => {
+    const payment = this.customerPayment() || 0;
+    return payment - this.subTotal();
+  });
   
   cartItems = signal<CartItem[]>([]);
   lastProduct = signal<CartItem | null>(null);
@@ -53,6 +59,32 @@ export class PosComponent {
   successMessage = signal<string | null>(null);
 
   salesHistory = signal<any[]>([]);
+
+  todaySales = computed(() => {
+    const today = new Date().toDateString();
+    return this.salesHistory().filter(s => {
+      if (!s.createdAt) return false;
+      return new Date(s.createdAt).toDateString() === today;
+    });
+  });
+
+  totalEfectivo = computed(() => {
+    return this.todaySales()
+      .filter(s => s.paymentMethod === 'Efectivo')
+      .reduce((sum, s) => sum + s.total, 0);
+  });
+
+  totalTarjeta = computed(() => {
+    return this.todaySales()
+      .filter(s => s.paymentMethod === 'Tarjeta')
+      .reduce((sum, s) => sum + s.total, 0);
+  });
+
+  totalVirtual = computed(() => {
+    return this.todaySales()
+      .filter(s => s.paymentMethod === 'Billetera Virtual')
+      .reduce((sum, s) => sum + s.total, 0);
+  });
   expandedSaleId = signal<string | null>(null);
   
   operatorEmail = signal<string>('invitado@sistema.com');
@@ -157,18 +189,51 @@ export class PosComponent {
     });
   }
 
-  nextPurchase() {
+  openPayment() {
+    if (this.cartItems().length === 0) return;
+    this.customerPayment.set(null);
+    this.viewState.set('payment');
+  }
+
+  cancelPayment() {
+    this.viewState.set('pos');
+  }
+
+  updatePaymentAmount(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const value = parseFloat(input.value);
+    this.customerPayment.set(isNaN(value) ? null : value);
+  }
+
+  cancelPurchase() {
+    this.cartItems.set([]);
+    this.lastProduct.set(null);
+    this.customerPayment.set(null);
+    this.viewState.set('pos');
+    this.setTempMessage('success', 'Compra cancelada.');
+  }
+
+  finalizePurchase(method: 'Efectivo' | 'Tarjeta' | 'Billetera Virtual') {
     if (this.cartItems().length === 0) return;
     
     this.isProcessing.set(true);
-    const sale = { items: this.cartItems(), total: this.subTotal(), operator: this.operatorEmail() };
+    const sale = { 
+      items: this.cartItems(), 
+      total: this.subTotal(), 
+      operator: this.operatorEmail(),
+      paymentMethod: method,
+      givenAmount: this.customerPayment() || 0,
+      change: this.changeAmount()
+    };
 
     this.posService.checkout(sale).subscribe({
       next: () => {
         this.isProcessing.set(false);
         this.cartItems.set([]);
         this.lastProduct.set(null);
+        this.customerPayment.set(null);
         this.setTempMessage('success', '¡Venta facturada con éxito!');
+        this.viewState.set('pos');
       },
       error: () => {
         this.isProcessing.set(false);
