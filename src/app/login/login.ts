@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, signal, inject, output } from '@angular/core';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 import { email, form, FormField, required, minLength } from '@angular/forms/signals';
 
 interface LoginData { email: string; password: string; }
@@ -14,6 +15,7 @@ interface LoginData { email: string; password: string; }
 })
 export class LoginComponent {
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   goToRegister = output<void>();
   goToForgot = output<void>();
@@ -49,7 +51,8 @@ export class LoginComponent {
       .subscribe({
         next: (response: any) => {
           this.isSubmitting.set(false);
-          this.errorMessage.set(response.message || 'Login exitoso.');
+          this.errorMessage.set(null);
+          this.router.navigate(['/pos']);
         },
         error: (err) => {
           this.isSubmitting.set(false);

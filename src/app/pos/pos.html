@@ -1,0 +1,149 @@
+<div class="pos-layout">
+  <header class="glass-panel pos-header">
+    <div class="brand">Terminal Register-Box</div>
+    @if (errorMessage()) {
+      <div class="alert-box error">{{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="alert-box success">{{ successMessage() }}</div>
+    }
+    <button class="glass-button logout-btn" (click)="logOut()">Salir</button>
+  </header>
+
+  @if (viewState() === 'pos') {
+    <div class="pos-grid">
+      <section class="glass-panel cart-section">
+        <h2>Carrito Actual</h2>
+        <div class="cart-list">
+          @for (item of cartItems(); track item.barcode) {
+            <div class="cart-item">
+              <span class="qty">{{ item.quantity }}x</span>
+              <span class="name">{{ item.name }}</span>
+              <span class="price">{{ item.price | currency }}</span>
+              <span class="total">{{ item.price * item.quantity | currency }}</span>
+            </div>
+          } @empty {
+            <div class="empty-cart">
+              <p>Escanee un producto o agréguelo manualmente para comenzar a facturar.</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="glass-panel last-product">
+          <h3>Último Escaneo</h3>
+          @if (lastProduct()) {
+            <div class="product-display">
+              <h1 class="main-name">{{ lastProduct()?.name }}</h1>
+              <h2 class="main-price">{{ lastProduct()?.price | currency }}</h2>
+              <p class="barcode-text">Cód: {{ lastProduct()?.barcode }}</p>
+            </div>
+          } @else {
+            <div class="product-display empty">
+              <p>Esperando lectura láser...</p>
+            </div>
+          }
+
+          <div class="manual-scan-box" style="margin-top: 1.5rem">
+            <label
+              style="
+                display: block;
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+                color: var(--text-secondary);
+              "
+            >
+              Código Manual (Presione Enter):
+            </label>
+            <input
+              #manualScan
+              type="text"
+              class="glass-input"
+              style="width: 100%; text-align: center; border: 1px solid rgba(255, 255, 255, 0.2)"
+              placeholder="Ej: 77912345..."
+              autofocus
+              (keyup.enter)="processBarcode(manualScan.value); manualScan.value = ''"
+            />
+          </div>
+        </div>
+
+        <div class="glass-panel subtotal-box">
+          <h3>Subtotal</h3>
+          <h1 class="huge-total">{{ subTotal() | currency }}</h1>
+        </div>
+
+        <div class="action-buttons">
+          <button class="glass-button action-btn add-btn" (click)="showAddProduct()">
+            + Agregar Producto Nuevo
+          </button>
+
+          <button class="glass-button action-btn history-btn" (click)="viewHistory()">
+            Ver Historial de Compras
+          </button>
+
+          <button
+            class="glass-button action-btn pay-btn"
+            [disabled]="cartItems().length === 0 || isProcessing()"
+            (click)="nextPurchase()"
+          >
+            Pasar a la Siguiente Compra
+          </button>
+        </div>
+      </aside>
+    </div>
+  }
+
+  @if (viewState() === 'history') {
+    <div class="history-view glass-panel">
+      <div class="history-header">
+        <h2>Historial de Compras Recientes</h2>
+        <button class="glass-button close-btn" (click)="closeView()">Volver a la Caja</button>
+      </div>
+      <div class="history-list">
+        @for (sale of salesHistory(); track sale._id) {
+          <div class="sale-card">
+            <div class="sale-info">
+              <span class="date">{{ sale.createdAt | date: 'short' }}</span>
+              <span class="total">{{ sale.total | currency }}</span>
+            </div>
+            <div class="sale-items">
+              @for (item of sale.items; track item.barcode) {
+                <span class="pill">{{ item.quantity }}x {{ item.name }}</span>
+              }
+            </div>
+          </div>
+        } @empty {
+          <p>No hay compras registradas en la base de datos.</p>
+        }
+      </div>
+    </div>
+  }
+
+  @if (viewState() === 'add') {
+    <div class="add-view glass-panel">
+      <div class="history-header">
+        <h2>Registrar Nuevo Producto</h2>
+        <button class="glass-button close-btn" (click)="closeView()">Volver a la Caja</button>
+      </div>
+      <div class="form-container">
+        <label>Código de Barras (Escanéelo o típeelo)</label>
+        <input #newBarcode type="text" class="glass-input" placeholder="Ej: 7791234567890" />
+
+        <label>Nombre del Producto</label>
+        <input #newName type="text" class="glass-input" placeholder="Ej: Café Molido 500g" />
+
+        <label>Precio Unitario</label>
+        <input #newPrice type="number" class="glass-input" placeholder="Ej: 1500.50" />
+
+        <button
+          class="glass-button action-btn pay-btn"
+          [disabled]="isProcessing()"
+          (click)="saveNewProduct(newBarcode.value, newName.value, newPrice.value)"
+        >
+          Guardar en Inventario
+        </button>
+      </div>
+    </div>
+  }
+</div>
