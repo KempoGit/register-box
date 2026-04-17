@@ -65,11 +65,23 @@ export class PosComponent {
     }, 3500);
   }
 
-  processBarcode(barcode: string) {
+  processBarcode(rawInput: string) {
+    if (!rawInput) return;
+    
+    let quantityToAdd = 1;
+    let barcode = rawInput.trim();
+
+    // Detectar formato multiplicador: *N [barcode]
+    const match = barcode.match(/^\*(\d+)\s+(.+)$/);
+    if (match) {
+      quantityToAdd = parseInt(match[1], 10);
+      barcode = match[2];
+    }
+
     const existing = this.cartItems().find(item => item.barcode === barcode);
     if (existing) {
       this.cartItems.update(items => items.map(item => 
-        item.barcode === barcode ? { ...item, quantity: item.quantity + 1 } : item
+        item.barcode === barcode ? { ...item, quantity: item.quantity + quantityToAdd } : item
       ));
       this.lastProduct.set(existing);
       return;
@@ -83,7 +95,7 @@ export class PosComponent {
           barcode: product.barcode, 
           name: product.name, 
           price: product.price, 
-          quantity: 1 
+          quantity: quantityToAdd 
         };
         this.cartItems.update(items => [...items, newItem]);
         this.lastProduct.set(newItem);

@@ -203,3 +203,34 @@
   background: #dc2626;
   color: white;
 }
+
+/* Local Overrides for Global Glass Elements */
+.glass-input {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.glass-button.logout-btn,
+.glass-button.close-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.form-container label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: -0.8rem;
+  margin-left: 0.2rem;
+}
