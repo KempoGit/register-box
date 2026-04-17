@@ -70,16 +70,58 @@ export class PosComponent {
     if (!rawInput) return;
     
     let quantityToAdd = 1;
+    let isSubtraction = false;
     let barcode = rawInput.trim();
 
-    // Detectar formato multiplicador: *N [barcode]
-    const match = barcode.match(/^\*(\d+)\s+(.+)$/);
-    if (match) {
-      quantityToAdd = parseInt(match[1], 10);
-      barcode = match[2];
+    // 1. Detectar resta con multiplicador ej: -3 123123123
+    const subMatchMulti = barcode.match(/^-(?:\s*)?(\d+)\s+(.+)$/);
+    // 2. Detectar suma con multiplicador ej: *3 123123123
+    const addMatchMulti = barcode.match(/^\*(\d+)\s+(.+)$/);
+
+    if (subMatchMulti) {
+      isSubtraction = true;
+      quantityToAdd = parseInt(subMatchMulti[1], 10);
+      barcode = subMatchMulti[2].trim();
+    } else if (addMatchMulti) {
+      quantityToAdd = parseInt(addMatchMulti[1], 10);
+      barcode = addMatchMulti[2].trim();
+    } else if (barcode.startsWith('-')) {
+      // 3. Detectar resta simple ej: - 123123123  o  -123123123
+      isSubtraction = true;
+      quantityToAdd = 1;
+      barcode = barcode.substring(1).trim();
     }
 
     const existing = this.cartItems().find(item => item.barcode === barcode);
+
+    // Flujo de Resta (Eliminación de ítems)
+    if (isSubtraction) {
+      if (!existing) {
+        this.setTempMessage('error', 'El producto no está en el carrito.');
+        return;
+      }
+      if (existing.quantity < quantityToAdd) {
+        this.setTempMessage('error', `No hay suficientes productos. Solo tienes ${existing.quantity}.`);
+        return;
+      }
+      
+      if (existing.quantity === quantityToAdd) {
+        // Eliminar del carrito completamente
+        this.cartItems.update(items => items.filter(item => item.barcode !== barcode));
+        if (this.lastProduct()?.barcode === barcode) {
+          this.lastProduct.set(null); 
+        }
+      } else {
+        // Reducir la cantidad
+        this.cartItems.update(items => items.map(item => 
+          item.barcode === barcode ? { ...item, quantity: item.quantity - quantityToAdd } : item
+        ));
+      }
+      this.setTempMessage('success', 'Producto removido del carrito.');
+      return;
+    }
+
+    // Flujo de Suma (Suma de ítems)
     if (existing) {
       this.cartItems.update(items => items.map(item => 
         item.barcode === barcode ? { ...item, quantity: item.quantity + quantityToAdd } : item
