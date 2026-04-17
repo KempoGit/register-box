@@ -53,6 +53,7 @@ export class PosComponent {
   successMessage = signal<string | null>(null);
 
   salesHistory = signal<any[]>([]);
+  expandedSaleId = signal<string | null>(null);
 
   constructor() {}
 
@@ -129,7 +130,12 @@ export class PosComponent {
 
   viewHistory() {
     this.viewState.set('history');
+    this.expandedSaleId.set(null); // Resetear acordeón
     this.posService.getSales().subscribe(res => this.salesHistory.set(res));
+  }
+
+  toggleSale(id: string) {
+    this.expandedSaleId.update(current => current === id ? null : id);
   }
 
   showAddProduct() {

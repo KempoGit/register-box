@@ -102,16 +102,60 @@
       </div>
       <div class="history-list">
         @for (sale of salesHistory(); track sale._id) {
-          <div class="sale-card">
+          <div
+            class="sale-card"
+            (click)="toggleSale(sale._id)"
+            style="cursor: pointer; transition: background 0.2s"
+          >
             <div class="sale-info">
-              <span class="date">{{ sale.createdAt | date: 'short' }}</span>
+              <span class="date"
+                >{{ sale.createdAt | date: 'shortTime' }} -
+                {{ sale.createdAt | date: 'dd/MM/yyyy' }}</span
+              >
               <span class="total">{{ sale.total | currency }}</span>
             </div>
-            <div class="sale-items">
-              @for (item of sale.items; track item.barcode) {
-                <span class="pill">{{ item.quantity }}x {{ item.name }}</span>
-              }
-            </div>
+
+            @if (expandedSaleId() === sale._id) {
+              <div
+                class="sale-items"
+                style="
+                  margin-top: 1rem;
+                  border-top: 1px solid rgba(255, 255, 255, 0.1);
+                  padding-top: 1rem;
+                "
+              >
+                <div
+                  style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.8rem"
+                >
+                  Detalle de Productos:
+                </div>
+                @for (item of sale.items; track item.barcode) {
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-bottom: 0.5rem;
+                      font-size: 0.95rem;
+                    "
+                  >
+                    <span
+                      ><strong style="color: var(--primary-color)">{{ item.quantity }}x</strong>
+                      &nbsp;{{ item.name }}</span
+                    >
+                    <span style="text-align: end">
+                      <span style="color: var(--text-secondary); font-size: 0.85rem"
+                        >{{ item.price | currency }} c/u
+                      </span>
+                      <br />
+                      <strong style="color: #fff">{{
+                        item.price * item.quantity | currency
+                      }}</strong>
+                    </span>
+                  </div>
+                }
+              </div>
+            }
           </div>
         } @empty {
           <p>No hay compras registradas en la base de datos.</p>
