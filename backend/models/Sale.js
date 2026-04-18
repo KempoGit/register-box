@@ -13,6 +13,15 @@ const SaleSchema = new mongoose.Schema(
     total: { type: Number, required: true },
     operator: { type: String, required: false, default: 'Desconocido' },
     paymentMethod: { type: String, required: false, default: 'No especificado' },
+    payments: {
+      type: [
+        {
+          method: { type: String },
+          amount: { type: Number },
+        },
+      ],
+      default: [],
+    },
     givenAmount: { type: Number, required: false },
     change: { type: Number, required: false },
   },

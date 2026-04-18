@@ -16,12 +16,20 @@ router.get('/', async (req, res) => {
 // POST /api/sales (Siguiente compra)
 router.post('/', async (req, res) => {
   try {
-    const { items, total, operator, paymentMethod, givenAmount, change } = req.body;
+    const { items, total, operator, paymentMethod, payments, givenAmount, change } = req.body;
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'No se enviaron productos para facturar' });
     }
 
-    const newSale = new Sale({ items, total, operator, paymentMethod, givenAmount, change });
+    const newSale = new Sale({
+      items,
+      total,
+      operator,
+      paymentMethod,
+      payments,
+      givenAmount,
+      change,
+    });
     await newSale.save();
 
     // Subtract stock

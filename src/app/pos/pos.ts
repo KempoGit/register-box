@@ -41,10 +41,17 @@ export class PosComponent {
 
   viewState = signal<'pos' | 'history' | 'add' | 'payment'>('pos');
   customerPayment = signal<number | null>(null);
+  partialPayments = signal<{method: string, amount: number}[]>([]);
+  isMultiPayment = signal<boolean>(false);
   
+  remainingTotal = computed(() => {
+    const paid = this.partialPayments().reduce((sum, p) => sum + p.amount, 0);
+    return this.subTotal() - paid;
+  });
+
   changeAmount = computed(() => {
     const payment = this.customerPayment() || 0;
-    return payment - this.subTotal();
+    return payment - this.remainingTotal();
   });
   
   cartItems = signal<CartItem[]>([]);
@@ -69,21 +76,30 @@ export class PosComponent {
   });
 
   totalEfectivo = computed(() => {
-    return this.todaySales()
-      .filter(s => s.paymentMethod === 'Efectivo')
-      .reduce((sum, s) => sum + s.total, 0);
+    return this.todaySales().reduce((sum, s) => {
+      if (s.payments && s.payments.length > 0) {
+        return sum + s.payments.filter((p: any) => p.method === 'Efectivo').reduce((a: number, p: any) => a + p.amount, 0);
+      }
+      return sum + (s.paymentMethod === 'Efectivo' ? s.total : 0);
+    }, 0);
   });
 
   totalTarjeta = computed(() => {
-    return this.todaySales()
-      .filter(s => s.paymentMethod === 'Tarjeta')
-      .reduce((sum, s) => sum + s.total, 0);
+    return this.todaySales().reduce((sum, s) => {
+      if (s.payments && s.payments.length > 0) {
+        return sum + s.payments.filter((p: any) => p.method === 'Tarjeta').reduce((a: number, p: any) => a + p.amount, 0);
+      }
+      return sum + (s.paymentMethod === 'Tarjeta' ? s.total : 0);
+    }, 0);
   });
 
   totalVirtual = computed(() => {
-    return this.todaySales()
-      .filter(s => s.paymentMethod === 'Billetera Virtual')
-      .reduce((sum, s) => sum + s.total, 0);
+    return this.todaySales().reduce((sum, s) => {
+      if (s.payments && s.payments.length > 0) {
+        return sum + s.payments.filter((p: any) => p.method === 'Billetera Virtual').reduce((a: number, p: any) => a + p.amount, 0);
+      }
+      return sum + (s.paymentMethod === 'Billetera Virtual' ? s.total : 0);
+    }, 0);
   });
   expandedSaleId = signal<string | null>(null);
   
@@ -209,6 +225,8 @@ export class PosComponent {
     this.cartItems.set([]);
     this.lastProduct.set(null);
     this.customerPayment.set(null);
+    this.partialPayments.set([]);
+    this.isMultiPayment.set(false);
     this.viewState.set('pos');
     this.setTempMessage('success', 'Compra cancelada.');
   }
@@ -216,13 +234,27 @@ export class PosComponent {
   finalizePurchase(method: 'Efectivo' | 'Tarjeta' | 'Billetera Virtual') {
     if (this.cartItems().length === 0) return;
     
+    // Calculate the effectively applied amount towards the ticket for this split.
+    const paidAmount = this.customerPayment() !== null ? this.customerPayment() : this.remainingTotal();
+    const appliedAmount = Math.min(paidAmount!, this.remainingTotal());
+    this.partialPayments.update(list => [...list, { method, amount: appliedAmount }]);
+
+    if (this.isMultiPayment()) {
+      this.customerPayment.set(null);
+      this.isMultiPayment.set(false);
+      if (this.remainingTotal() > 0) {
+        return; // Stay in the payment modal until balance is fulfilled
+      }
+    }
+    
     this.isProcessing.set(true);
     const sale = { 
       items: this.cartItems(), 
       total: this.subTotal(), 
       operator: this.operatorEmail(),
       paymentMethod: method,
-      givenAmount: this.customerPayment() || 0,
+      payments: this.partialPayments(),
+      givenAmount: paidAmount!,
       change: this.changeAmount()
     };
 
@@ -232,11 +264,14 @@ export class PosComponent {
         this.cartItems.set([]);
         this.lastProduct.set(null);
         this.customerPayment.set(null);
+        this.partialPayments.set([]);
+        this.isMultiPayment.set(false);
         this.setTempMessage('success', '¡Venta facturada con éxito!');
         this.viewState.set('pos');
       },
       error: () => {
         this.isProcessing.set(false);
+        this.partialPayments.update(list => list.slice(0, -1));
         this.setTempMessage('error', 'Error del servidor cerrando compra.');
       }
     });

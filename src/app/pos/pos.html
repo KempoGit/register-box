@@ -243,7 +243,7 @@
       </div>
       <div class="form-container" style="text-align: center; margin-top: 1rem">
         <h1 style="color: var(--primary-color); font-size: 3rem; margin-bottom: 2rem">
-          Total: {{ subTotal() | currency }}
+          Total Restante: {{ remainingTotal() | currency }}
         </h1>
 
         <label
@@ -273,6 +273,59 @@
           (input)="updatePaymentAmount($event)"
           autofocus
         />
+
+        <div style="margin: 1.5rem auto; width: 60%; text-align: left">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+              color: #fff;
+              font-size: 1.1rem;
+              cursor: pointer;
+              justify-content: center;
+            "
+          >
+            <input
+              type="checkbox"
+              [checked]="isMultiPayment()"
+              (change)="isMultiPayment.set(!isMultiPayment())"
+              style="width: 1.5rem; height: 1.5rem; accent-color: var(--primary-color)"
+            />
+            Pago Múltiple (Agregar otro medio de pago)
+          </label>
+        </div>
+
+        @if (partialPayments().length > 0) {
+          <div
+            style="
+              margin: 1rem auto;
+              width: 60%;
+              text-align: left;
+              padding: 1rem;
+              background: rgba(0, 0, 0, 0.2);
+              border-radius: 8px;
+            "
+          >
+            <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: bold">
+              Pagos ya aplicados:
+            </p>
+            @for (p of partialPayments(); track p) {
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  color: #fff;
+                  font-size: 1.1rem;
+                  padding: 0.25rem 0;
+                "
+              >
+                <span>{{ p.method }}</span>
+                <span style="color: #4ade80">{{ p.amount | currency }}</span>
+              </div>
+            }
+          </div>
+        }
 
         <div
           style="
