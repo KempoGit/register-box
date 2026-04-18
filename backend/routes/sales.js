@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Sale = require('../models/Sale');
+const Product = require('../models/Product');
 
 // GET /api/sales (Ver histórico)
 router.get('/', async (req, res) => {
@@ -22,6 +23,11 @@ router.post('/', async (req, res) => {
 
     const newSale = new Sale({ items, total, operator, paymentMethod, givenAmount, change });
     await newSale.save();
+
+    // Subtract stock
+    for (const item of items) {
+      await Product.updateOne({ barcode: item.barcode }, { $inc: { stock: -item.quantity } });
+    }
 
     res.status(201).json(newSale);
   } catch (error) {
