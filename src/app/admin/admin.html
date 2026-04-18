@@ -50,6 +50,7 @@
             <th>Nombre del Producto</th>
             <th>Precio ($)</th>
             <th>Stock</th>
+            <th>Caducidad</th>
             <th>Mantenimiento</th>
           </tr>
         </thead>
@@ -89,6 +90,14 @@
                     [value]="prod.stock !== undefined ? prod.stock : 0"
                   />
                 </td>
+                <td>
+                  <input
+                    #editExpiration
+                    type="date"
+                    class="glass-input small-input"
+                    [value]="prod.expiration || ''"
+                  />
+                </td>
                 <td class="table-actions">
                   <button
                     class="glass-button action-btn save-btn"
@@ -99,7 +108,8 @@
                         editBarcode.value,
                         editName.value,
                         editPrice.value,
-                        editStock.value
+                        editStock.value,
+                        editExpiration.value
                       )
                     "
                   >
@@ -124,6 +134,7 @@
                     prod.stock || 0
                   }}</strong>
                 </td>
+                <td style="color: var(--text-secondary)">{{ prod.expiration || 'N/A' }}</td>
                 <td class="table-actions">
                   <button class="glass-button action-btn edit-btn" (click)="startEditing(prod._id)">
                     ✎ Modificar

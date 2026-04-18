@@ -291,10 +291,15 @@ export class PosComponent {
     this.viewState.set('add');
   }
 
-  saveNewProduct(barcode: string, name: string, price: string) {
+  saveNewProduct(barcode: string, name: string, price: string, expiration: string) {
     if (!barcode || !name || !price) return;
     this.isProcessing.set(true);
-    this.posService.addProduct({ barcode, name, price: Number(price) }).subscribe({
+    const newProd: { barcode: string, name: string, price: number, stock: number, expiration?: string } = { 
+      barcode, name, price: Number(price), stock: 0 
+    };
+    if (expiration) newProd.expiration = expiration;
+
+    this.posService.addProduct(newProd).subscribe({
       next: () => {
         this.isProcessing.set(false);
         this.setTempMessage('success', 'Producto guardado en inventario.');

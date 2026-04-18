@@ -15,11 +15,11 @@ export class PosService {
     return this.http.get(`${this.apiUrl}/products/${barcode}`);
   }
 
-  addProduct(product: { barcode: string; name: string; price: number; stock?: number }): Observable<any> {
+  addProduct(product: { barcode: string; name: string; price: number; stock?: number; expiration?: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/products`, product);
   }
 
-  updateProduct(id: string, product: { barcode: string; name: string; price: number; stock: number }): Observable<any> {
+  updateProduct(id: string, product: { barcode: string; name: string; price: number; stock: number; expiration?: string }): Observable<any> {
     return this.http.put(`${this.apiUrl}/products/${id}`, product);
   }
 

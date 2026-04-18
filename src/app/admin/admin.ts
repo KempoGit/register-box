@@ -54,9 +54,9 @@ export class AdminComponent {
     this.editingProductId.set(null);
   }
 
-  saveProduct(id: string, barcode: string, name: string, price: string, stock: string) {
+  saveProduct(id: string, barcode: string, name: string, price: string, stock: string, expiration: string) {
     this.isProcessing.set(true);
-    this.posService.updateProduct(id, { barcode, name, price: Number(price), stock: Number(stock) }).subscribe({
+    this.posService.updateProduct(id, { barcode, name, price: Number(price), stock: Number(stock), expiration }).subscribe({
       next: () => {
         this.successMessage.set('Producto actualizado con éxito.');
         this.editingProductId.set(null);

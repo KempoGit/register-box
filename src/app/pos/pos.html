@@ -422,10 +422,20 @@
         <label>Precio Unitario ($)</label>
         <input #newPrice type="number" class="glass-input" placeholder="Ej: 1500.50" />
 
+        <label>Fecha de Caducidad (Opcional)</label>
+        <input
+          #newExpiration
+          type="date"
+          class="glass-input"
+          style="color: #fff; background: rgba(0, 0, 0, 0.2)"
+        />
+
         <button
           class="glass-button action-btn pay-btn"
           [disabled]="isProcessing()"
-          (click)="saveNewProduct(newBarcode.value, newName.value, newPrice.value)"
+          (click)="
+            saveNewProduct(newBarcode.value, newName.value, newPrice.value, newExpiration.value)
+          "
         >
           Guardar en Inventario
         </button>
