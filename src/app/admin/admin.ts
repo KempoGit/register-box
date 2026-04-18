@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { PosService } from '../services/pos.service';
+import { I18nService, Language } from '../services/i18n.service';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
@@ -14,6 +15,12 @@ import { CurrencyPipe } from '@angular/common';
 export class AdminComponent {
   private posService = inject(PosService);
   private router = inject(Router);
+  public i18n = inject(I18nService);
+
+  changeLang(event: Event) {
+    const val = (event.target as HTMLSelectElement).value as Language;
+    this.i18n.setLanguage(val);
+  }
 
   viewState = signal<'login' | 'dashboard'>('login');
   
@@ -30,7 +37,7 @@ export class AdminComponent {
       this.viewState.set('dashboard');
       this.loadProducts();
     } else {
-      this.errorMessage.set('Credenciales inválidas.');
+      this.errorMessage.set(this.i18n.t('invalidCredentials'));
       setTimeout(() => this.errorMessage.set(null), 3000);
     }
   }
@@ -58,14 +65,14 @@ export class AdminComponent {
     this.isProcessing.set(true);
     this.posService.updateProduct(id, { barcode, name, price: Number(price), stock: Number(stock), expiration }).subscribe({
       next: () => {
-        this.successMessage.set('Producto actualizado con éxito.');
+        this.successMessage.set(this.i18n.t('prodUpdated'));
         this.editingProductId.set(null);
         this.loadProducts();
         setTimeout(() => this.successMessage.set(null), 3000);
       },
       error: () => {
         this.isProcessing.set(false);
-        this.errorMessage.set('Error actualizando producto.');
+        this.errorMessage.set(this.i18n.t('prodUpdateError'));
         setTimeout(() => this.errorMessage.set(null), 3000);
       }
     });

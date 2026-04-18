@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject, effect, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { ScannerService } from '../services/scanner.service';
 import { PosService } from '../services/pos.service';
+import { I18nService, Language } from '../services/i18n.service';
 import { Router } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 
@@ -23,6 +24,12 @@ export class PosComponent {
   private scanner = inject(ScannerService);
   private posService = inject(PosService);
   private router = inject(Router);
+  public i18n = inject(I18nService);
+
+  changeLang(event: Event) {
+    const val = (event.target as HTMLSelectElement).value as Language;
+    this.i18n.setLanguage(val);
+  }
 
   @ViewChild('manualScan') manualScanInput?: ElementRef<HTMLInputElement>;
 
@@ -152,11 +159,11 @@ export class PosComponent {
     // Flujo de Resta (Eliminación de ítems)
     if (isSubtraction) {
       if (!existing) {
-        this.setTempMessage('error', 'El producto no está en el carrito.');
+        this.setTempMessage('error', this.i18n.t('prodNotInCart'));
         return;
       }
       if (existing.quantity < quantityToAdd) {
-        this.setTempMessage('error', `No hay suficientes productos. Solo tienes ${existing.quantity}.`);
+        this.setTempMessage('error', this.i18n.t('notEnoughProd') + ' ' + existing.quantity);
         return;
       }
       
@@ -172,7 +179,7 @@ export class PosComponent {
           item.barcode === barcode ? { ...item, quantity: item.quantity - quantityToAdd } : item
         ));
       }
-      this.setTempMessage('success', 'Producto removido del carrito.');
+      this.setTempMessage('success', this.i18n.t('prodRemoved'));
       return;
     }
 
@@ -200,7 +207,7 @@ export class PosComponent {
       },
       error: () => {
         this.isProcessing.set(false);
-        this.setTempMessage('error', `Producto no encontrado: ${barcode}`);
+        this.setTempMessage('error', this.i18n.t('prodNotFound') + ' ' + barcode);
       }
     });
   }
@@ -228,7 +235,7 @@ export class PosComponent {
     this.partialPayments.set([]);
     this.isMultiPayment.set(false);
     this.viewState.set('pos');
-    this.setTempMessage('success', 'Compra cancelada.');
+    this.setTempMessage('success', this.i18n.t('purchaseCanceled'));
   }
 
   finalizePurchase(method: 'Efectivo' | 'Tarjeta' | 'Billetera Virtual') {
@@ -266,13 +273,13 @@ export class PosComponent {
         this.customerPayment.set(null);
         this.partialPayments.set([]);
         this.isMultiPayment.set(false);
-        this.setTempMessage('success', '¡Venta facturada con éxito!');
+        this.setTempMessage('success', this.i18n.t('saleSuccess'));
         this.viewState.set('pos');
       },
       error: () => {
         this.isProcessing.set(false);
         this.partialPayments.update(list => list.slice(0, -1));
-        this.setTempMessage('error', 'Error del servidor cerrando compra.');
+        this.setTempMessage('error', this.i18n.t('saleError'));
       }
     });
   }
@@ -302,12 +309,12 @@ export class PosComponent {
     this.posService.addProduct(newProd).subscribe({
       next: () => {
         this.isProcessing.set(false);
-        this.setTempMessage('success', 'Producto guardado en inventario.');
+        this.setTempMessage('success', this.i18n.t('prodSaved'));
         this.viewState.set('pos');
       },
       error: () => {
         this.isProcessing.set(false);
-        this.setTempMessage('error', 'Error. El código podría estar ya registrado.');
+        this.setTempMessage('error', this.i18n.t('prodSaveError'));
       }
     });
   }

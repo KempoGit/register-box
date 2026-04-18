@@ -1,9 +1,9 @@
 <div class="pos-layout">
   <header class="glass-panel pos-header">
     <div>
-      <div class="brand">Terminal Register-Box</div>
+      <div class="brand">{{ i18n.t('posBrand') }}</div>
       <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px">
-        Cajero: <span style="color: #4ade80">{{ operatorEmail() }}</span>
+        {{ i18n.t('cashier') }} <span style="color: #4ade80">{{ operatorEmail() }}</span>
       </div>
     </div>
     @if (errorMessage()) {
@@ -12,13 +12,25 @@
     @if (successMessage()) {
       <div class="alert-box success">{{ successMessage() }}</div>
     }
-    <button class="glass-button logout-btn" (click)="logOut()">Salir</button>
+    <div style="display: flex; gap: 1rem; align-items: center">
+      <select
+        class="glass-input"
+        style="padding: 0.5rem; width: auto; font-size: 0.9rem"
+        [value]="i18n.currentLang()"
+        (change)="changeLang($event)"
+      >
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+      </select>
+      <button class="glass-button logout-btn" (click)="logOut()">{{ i18n.t('logout') }}</button>
+    </div>
   </header>
 
   @if (viewState() === 'pos') {
     <div class="pos-grid">
       <section class="glass-panel cart-section">
-        <h2>Carrito Actual</h2>
+        <h2>{{ i18n.t('currentCart') }}</h2>
         <div class="cart-list">
           @for (item of cartItems(); track item.barcode) {
             <div class="cart-item">
@@ -29,7 +41,7 @@
             </div>
           } @empty {
             <div class="empty-cart">
-              <p>Escanee un producto o agréguelo manualmente para comenzar a facturar.</p>
+              <p>{{ i18n.t('emptyCartMsg') }}</p>
             </div>
           }
         </div>
@@ -37,16 +49,16 @@
 
       <aside class="side-panel">
         <div class="glass-panel last-product">
-          <h3>Último Escaneo</h3>
+          <h3>{{ i18n.t('lastScan') }}</h3>
           @if (lastProduct()) {
             <div class="product-display">
               <h1 class="main-name">{{ lastProduct()?.name }}</h1>
               <h2 class="main-price">{{ lastProduct()?.price | currency }}</h2>
-              <p class="barcode-text">Cód: {{ lastProduct()?.barcode }}</p>
+              <p class="barcode-text">{{ i18n.t('code') }} {{ lastProduct()?.barcode }}</p>
             </div>
           } @else {
             <div class="product-display empty">
-              <p>Esperando lectura láser...</p>
+              <p>{{ i18n.t('waitingScan') }}</p>
             </div>
           }
 
@@ -59,14 +71,14 @@
                 color: var(--text-secondary);
               "
             >
-              Código Manual (Presione Enter):
+              {{ i18n.t('manualCode') }}
             </label>
             <input
               #manualScan
               type="text"
               class="glass-input"
               style="width: 100%; text-align: center; border: 1px solid rgba(255, 255, 255, 0.2)"
-              placeholder="Ej: 77912345..."
+              [placeholder]="i18n.t('manualCodePlaceholder')"
               autofocus
               (keyup.enter)="processBarcode(manualScan.value); manualScan.value = ''"
             />
@@ -74,17 +86,17 @@
         </div>
 
         <div class="glass-panel subtotal-box">
-          <h3>Subtotal</h3>
+          <h3>{{ i18n.t('subtotal') }}</h3>
           <h1 class="huge-total">{{ subTotal() | currency }}</h1>
         </div>
 
         <div class="action-buttons">
           <button class="glass-button action-btn add-btn" (click)="showAddProduct()">
-            + Agregar Producto Nuevo
+            {{ i18n.t('addNewProduct') }}
           </button>
 
           <button class="glass-button action-btn history-btn" (click)="viewHistory()">
-            Ver Historial de Compras
+            {{ i18n.t('viewHistory') }}
           </button>
 
           <button
@@ -92,7 +104,7 @@
             [disabled]="cartItems().length === 0 || isProcessing()"
             (click)="openPayment()"
           >
-            Pago
+            {{ i18n.t('payment') }}
           </button>
         </div>
       </aside>
@@ -102,8 +114,10 @@
   @if (viewState() === 'history') {
     <div class="history-view glass-panel">
       <div class="history-header">
-        <h2>Historial de Compras de Hoy</h2>
-        <button class="glass-button close-btn" (click)="closeView()">Volver a la Caja</button>
+        <h2>{{ i18n.t('historyToday') }}</h2>
+        <button class="glass-button close-btn" (click)="closeView()">
+          {{ i18n.t('backToPos') }}
+        </button>
       </div>
 
       <div style="display: flex; gap: 1rem; margin-bottom: 2rem">
@@ -118,7 +132,7 @@
           "
         >
           <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 1rem">
-            Caja Efectivo
+            {{ i18n.t('cashRegister') }}
           </h3>
           <h2 style="color: #4ade80; font-size: 2rem; margin: 0">
             {{ totalEfectivo() | currency }}
@@ -135,7 +149,7 @@
           "
         >
           <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 1rem">
-            Caja Tarjeta
+            {{ i18n.t('cardRegister') }}
           </h3>
           <h2 style="color: #60a5fa; font-size: 2rem; margin: 0">
             {{ totalTarjeta() | currency }}
@@ -152,7 +166,7 @@
           "
         >
           <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 1rem">
-            Caja Virtual
+            {{ i18n.t('virtualRegister') }}
           </h3>
           <h2 style="color: #c084fc; font-size: 2rem; margin: 0">
             {{ totalVirtual() | currency }}
@@ -193,10 +207,11 @@
                     justify-content: space-between;
                   "
                 >
-                  <span>Detalle de Productos:</span>
+                  <span>{{ i18n.t('productDetails') }}</span>
                   @if (sale.operator) {
                     <span
-                      >Cajero: <strong style="color: #fff">{{ sale.operator }}</strong></span
+                      >{{ i18n.t('cashier') }}
+                      <strong style="color: #fff">{{ sale.operator }}</strong></span
                     >
                   }
                 </div>
@@ -216,7 +231,7 @@
                     >
                     <span style="text-align: end">
                       <span style="color: var(--text-secondary); font-size: 0.85rem"
-                        >{{ item.price | currency }} c/u
+                        >{{ item.price | currency }} {{ i18n.t('each') }}
                       </span>
                       <br />
                       <strong style="color: #fff">{{
@@ -229,7 +244,7 @@
             }
           </div>
         } @empty {
-          <p>No hay compras registradas en la base de datos.</p>
+          <p>{{ i18n.t('noPurchases') }}</p>
         }
       </div>
     </div>
@@ -238,12 +253,14 @@
   @if (viewState() === 'payment') {
     <div class="payment-view glass-panel">
       <div class="history-header">
-        <h2>Procesar Pago</h2>
-        <button class="glass-button close-btn" (click)="cancelPayment()">Volver</button>
+        <h2>{{ i18n.t('processPayment') }}</h2>
+        <button class="glass-button close-btn" (click)="cancelPayment()">
+          {{ i18n.t('back') }}
+        </button>
       </div>
       <div class="form-container" style="text-align: center; margin-top: 1rem">
         <h1 style="color: var(--primary-color); font-size: 3rem; margin-bottom: 2rem">
-          Total Restante: {{ remainingTotal() | currency }}
+          {{ i18n.t('remainingTotal') }} {{ remainingTotal() | currency }}
         </h1>
 
         <label
@@ -254,7 +271,7 @@
             color: var(--text-secondary);
           "
         >
-          ¿Con cuánto paga el cliente?
+          {{ i18n.t('paymentAmountLabel') }}
         </label>
         <input
           type="number"
@@ -268,7 +285,7 @@
             margin-left: auto;
             margin-right: auto;
           "
-          placeholder="Ej: 5000"
+          [placeholder]="i18n.t('paymentAmountPlaceholder')"
           [value]="customerPayment() || ''"
           (input)="updatePaymentAmount($event)"
           autofocus
@@ -292,7 +309,7 @@
               (change)="isMultiPayment.set(!isMultiPayment())"
               style="width: 1.5rem; height: 1.5rem; accent-color: var(--primary-color)"
             />
-            Pago Múltiple (Agregar otro medio de pago)
+            {{ i18n.t('multiPaymentLabel') }}
           </label>
         </div>
 
@@ -308,7 +325,7 @@
             "
           >
             <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: bold">
-              Pagos ya aplicados:
+              {{ i18n.t('appliedPayments') }}
             </p>
             @for (p of partialPayments(); track p) {
               <div
@@ -337,7 +354,7 @@
           "
         >
           <h2 style="font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 0.5rem">
-            Vuelto a entregar:
+            {{ i18n.t('changeToGive') }}
           </h2>
           <h1 style="font-size: 3.5rem; color: #4ade80; margin: 0">
             {{ changeAmount() | currency }}
@@ -357,7 +374,7 @@
             (click)="finalizePurchase('Efectivo')"
             [disabled]="isProcessing()"
           >
-            Pago
+            {{ i18n.t('payEfectivo') }}
           </button>
           <button
             class="glass-button action-btn"
@@ -371,7 +388,7 @@
             (click)="finalizePurchase('Tarjeta')"
             [disabled]="isProcessing()"
           >
-            Pago con Tarjeta
+            {{ i18n.t('payCard') }}
           </button>
           <button
             class="glass-button action-btn"
@@ -385,7 +402,7 @@
             (click)="finalizePurchase('Billetera Virtual')"
             [disabled]="isProcessing()"
           >
-            Billetera Virtual
+            {{ i18n.t('payVirtual') }}
           </button>
           <button
             class="glass-button action-btn"
@@ -399,7 +416,7 @@
             (click)="cancelPurchase()"
             [disabled]="isProcessing()"
           >
-            No pago
+            {{ i18n.t('noPayment') }}
           </button>
         </div>
       </div>
@@ -409,20 +426,37 @@
   @if (viewState() === 'add') {
     <div class="add-view glass-panel">
       <div class="history-header">
-        <h2>Registrar Nuevo Producto</h2>
-        <button class="glass-button close-btn" (click)="closeView()">Volver a la Caja</button>
+        <h2>{{ i18n.t('registerNewProduct') }}</h2>
+        <button class="glass-button close-btn" (click)="closeView()">
+          {{ i18n.t('backToPos') }}
+        </button>
       </div>
       <div class="form-container">
-        <label>Código de Barras (Escanéelo o típeelo)</label>
-        <input #newBarcode type="text" class="glass-input" placeholder="Ej: 7791234567890" />
+        <label>{{ i18n.t('barcodeLabel') }}</label>
+        <input
+          #newBarcode
+          type="text"
+          class="glass-input"
+          [placeholder]="i18n.t('barcodePlaceholder')"
+        />
 
-        <label>Nombre del Producto</label>
-        <input #newName type="text" class="glass-input" placeholder="Ej: Café Molido 500g" />
+        <label>{{ i18n.t('productNameLabel') }}</label>
+        <input
+          #newName
+          type="text"
+          class="glass-input"
+          [placeholder]="i18n.t('productNamePlaceholder')"
+        />
 
-        <label>Precio Unitario ($)</label>
-        <input #newPrice type="number" class="glass-input" placeholder="Ej: 1500.50" />
+        <label>{{ i18n.t('priceLabel') }}</label>
+        <input
+          #newPrice
+          type="number"
+          class="glass-input"
+          [placeholder]="i18n.t('pricePlaceholder')"
+        />
 
-        <label>Fecha de Caducidad (Opcional)</label>
+        <label>{{ i18n.t('expirationLabel') }}</label>
         <input
           #newExpiration
           type="date"
@@ -437,7 +471,7 @@
             saveNewProduct(newBarcode.value, newName.value, newPrice.value, newExpiration.value)
           "
         >
-          Guardar en Inventario
+          {{ i18n.t('saveInventory') }}
         </button>
       </div>
     </div>

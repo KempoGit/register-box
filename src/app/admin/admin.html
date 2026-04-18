@@ -1,14 +1,14 @@
 <div class="admin-container">
   @if (viewState() === 'login') {
     <div class="glass-panel login-box">
-      <h2>Acceso Administrativo</h2>
+      <h2>{{ i18n.t('adminAccess') }}</h2>
       @if (errorMessage()) {
         <div class="alert-box error" style="margin-bottom: 2rem">{{ errorMessage() }}</div>
       }
       <div class="form-container">
-        <label>Usuario Maestro</label>
+        <label>{{ i18n.t('masterUser') }}</label>
         <input #user type="text" class="glass-input" placeholder="admin" />
-        <label>Contraseña Maestra</label>
+        <label>{{ i18n.t('masterPass') }}</label>
         <input
           #pass
           type="password"
@@ -23,35 +23,50 @@
           (click)="login(user.value, pass.value)"
           style="margin-top: 1rem"
         >
-          Ingresar al Panel
+          {{ i18n.t('enterPanel') }}
         </button>
-        <button class="glass-button close-btn" (click)="goToPos()">Volver a Seguridad</button>
+        <button class="glass-button close-btn" (click)="goToPos()">
+          {{ i18n.t('backToSecurity') }}
+        </button>
       </div>
     </div>
   }
 
   @if (viewState() === 'dashboard') {
     <header class="glass-panel admin-header">
-      <div class="brand">Control de Inventario DB</div>
+      <div class="brand">{{ i18n.t('inventoryControl') }}</div>
       @if (errorMessage()) {
         <div class="alert-box error">{{ errorMessage() }}</div>
       }
       @if (successMessage()) {
         <div class="alert-box success">{{ successMessage() }}</div>
       }
-      <button class="glass-button logout-btn" (click)="logOut()">Cerrar Sesión</button>
+
+      <div style="display: flex; gap: 1rem; align-items: center">
+        <select
+          class="glass-input"
+          style="padding: 0.5rem; width: auto; font-size: 0.9rem"
+          [value]="i18n.currentLang()"
+          (change)="changeLang($event)"
+        >
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+        <button class="glass-button logout-btn" (click)="logOut()">{{ i18n.t('logout') }}</button>
+      </div>
     </header>
 
     <div class="glass-panel product-grid-box">
       <table class="glass-table">
         <thead>
           <tr>
-            <th>Código de Barras</th>
-            <th>Nombre del Producto</th>
-            <th>Precio ($)</th>
-            <th>Stock</th>
-            <th>Caducidad</th>
-            <th>Mantenimiento</th>
+            <th>{{ i18n.t('barcodeCol') }}</th>
+            <th>{{ i18n.t('nameCol') }}</th>
+            <th>{{ i18n.t('priceCol') }}</th>
+            <th>{{ i18n.t('stockCol') }}</th>
+            <th>{{ i18n.t('expirationCol') }}</th>
+            <th>{{ i18n.t('maintenanceCol') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -113,10 +128,10 @@
                       )
                     "
                   >
-                    Guardar DB
+                    {{ i18n.t('saveDb') }}
                   </button>
                   <button class="glass-button action-btn cancel-btn" (click)="cancelEditing()">
-                    Cancelar
+                    {{ i18n.t('cancel') }}
                   </button>
                 </td>
               } @else {
@@ -137,15 +152,15 @@
                 <td style="color: var(--text-secondary)">{{ prod.expiration || 'N/A' }}</td>
                 <td class="table-actions">
                   <button class="glass-button action-btn edit-btn" (click)="startEditing(prod._id)">
-                    ✎ Modificar
+                    {{ i18n.t('modify') }}
                   </button>
                 </td>
               }
             </tr>
           } @empty {
             <tr>
-              <td colspan="4" class="empty-state">
-                No se registraron productos físicos en la base de datos de MongoDB.
+              <td colspan="6" class="empty-state">
+                {{ i18n.t('noProductsDb') }}
               </td>
             </tr>
           }
